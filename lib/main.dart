@@ -32,23 +32,36 @@ class _WebViewAppState extends State<WebViewApp> {
     print("没有选择图片");
     return [];
   }
+
   /// 打开文件管理器返回文件的URI
   Future<List<String>> _openFile(List<String>? acceptTypes) async {
     final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false, // 是否允许多选
+      allowMultiple: false, // 是否允许多选 @TODO
       // type: FileType.image, // image
       type: FileType.custom, // 自定义类型
       allowedExtensions: acceptTypes, // 子允许自定义类型文件
       // allowedExtensions: ['pdf', 'doc'], // 只允许pdf doc类型
     );
     if (result != null && result.files.isNotEmpty) {
-      String filePath = result.files.single.path!; // 获取的是单个文件
+      print("console.log：选中的文件：${result.files}");
+      String filePath = result.files.single.path!; // 获取的是单个文件 @TODO
       print("console.log: $filePath");
       Uri fileUri = Uri.file(filePath);
       return [fileUri.toString()];
     }
     print("没有选择文件");
     return [];
+  }
+
+  /// 给H5注入一些方法供H5调用
+  void _injectJavaScript() {
+    // 注入 JavaScript 方法供 H5 调用
+    _controller.runJavaScript('''
+      window.bridge = {};
+      window.bridge.getAccessToken = function() {
+        return '123123';
+      };
+    ''');
   }
 
   @override
@@ -58,7 +71,13 @@ class _WebViewAppState extends State<WebViewApp> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageStarted: (url) {
+          _injectJavaScript(); // 页面开始加载时就需要注入 JavaScript 代码，防止H5初始化读取不到必要的参数
+        }
+      ))
       ..loadRequest(Uri.parse('http://192.168.12.137:10086/'));
+      // ..loadRequest(Uri.parse('http://192.168.12.137:8080/'));
 
     if (_controller.platform is AndroidWebViewController) {
       final AndroidWebViewController androidController = _controller.platform as AndroidWebViewController;
