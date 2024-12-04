@@ -20,8 +20,10 @@ class _WebViewAppState extends State<WebViewApp> {
   final ImagePicker _imagePicker = ImagePicker();
 
   /// 打开相册返回图片URI
-  Future<List<String>> _openGallery() async {
-    final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+  Future<List<String>> _openGallery(bool isCaptureEnabled) async {
+    // source: ImageSource.gallery // 打开用户相册
+    // source: ImageSource.camera // 打开摄像头
+    final XFile? image = await _imagePicker.pickImage(source: isCaptureEnabled ? ImageSource.camera : ImageSource.gallery);
     if (image != null) {
       final String filePath = image.path;
       final Uri fileUri = Uri.file(filePath);
@@ -63,10 +65,10 @@ class _WebViewAppState extends State<WebViewApp> {
 
       androidController.setOnShowFileSelector((params) async {
         print("console.log：接收到的类型 ${params.acceptTypes}");
-        print("console.log：接收到 multiple参数 mode：${params.mode}");
-        // print("FileSelectorMode.open 为单选、FileSelectorMode.openMultiple 为多选");
+        print("console.log：接收到 multiple参数 mode：${params.mode}"); // FileSelectorMode.open 为单选、FileSelectorMode.openMultiple 为多选
+        print("console.log：接收到 capture参数 是否为打开相机 ${params.isCaptureEnabled}");
         if (params.acceptTypes.contains('image/*')) {
-          return _openGallery();
+          return _openGallery(params.isCaptureEnabled);
         }
         List<String> acceptTypes = params.acceptTypes.map((ext) => ext.replaceFirst('.', '')).toList();
         return _openFile(acceptTypes);
