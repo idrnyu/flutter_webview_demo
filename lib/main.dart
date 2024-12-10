@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'dart:io' show Platform;
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:file_picker/file_picker.dart';
@@ -55,11 +56,12 @@ class _WebViewAppState extends State<WebViewApp> {
 
   /// 给H5注入一些方法供H5调用
   void _injectJavaScript() {
+    const token = 'teset';
     // 注入 JavaScript 方法供 H5 调用
     _controller.runJavaScript('''
       window.bridge = {};
       window.bridge.getAccessToken = function() {
-        return '123123';
+        return '$token';
       };
     ''');
   }
@@ -76,8 +78,9 @@ class _WebViewAppState extends State<WebViewApp> {
           _injectJavaScript(); // 页面开始加载时就需要注入 JavaScript 代码，防止H5初始化读取不到必要的参数
         }
       ))
-      ..loadRequest(Uri.parse('http://192.168.12.137:10086/'));
-      // ..loadRequest(Uri.parse('http://192.168.12.137:8080/'));
+      // ..loadRequest(Uri.parse('http://192.168.12.137:10086/'));
+      // ..loadRequest(Uri.parse('http://192.168.12.137:8080/add-government-activity?level1=1860892097729331202&level2=1861254434824790018&code=XXPX'));
+      ..loadFlutterAsset('assets/index.html');
 
     if (_controller.platform is AndroidWebViewController) {
       final AndroidWebViewController androidController = _controller.platform as AndroidWebViewController;

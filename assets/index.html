@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Multiple Files</title>
+</head>
+
+<body>
+  <h1>图片选择</h1>
+  <input type="file" id="fileInput" accept="image/*" multiple>
+  <div id="preview"></div>
+
+  <h1>文件选择</h1>
+  <input type="file" id="" accept=".pdf, .xlsx">
+
+  <h1>选择相机</h1>
+  <input type="file" id="fileInput1" accept="image/*" capture="camera">
+  <div id="preview1"></div>
+
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      const files = event.target.files;
+      const preview = document.getElementById('preview');
+      preview.innerHTML = ''; // Clear previous previews
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.maxWidth = '200px'; // Optional: Set a max width for preview images
+          preview.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+      });
+    });
+    document.getElementById('fileInput1').addEventListener('change', function (event) {
+      const files = event.target.files;
+      const preview = document.getElementById('preview1');
+      preview.innerHTML = ''; // Clear previous previews
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.maxWidth = '200px'; // Optional: Set a max width for preview images
+          preview.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+      });
+    });
+  </script>
+</body>
+
+</html>
